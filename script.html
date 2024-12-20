@@ -157,6 +157,15 @@
       .input-area button:hover {
         background-color: #5b6e9e; /* Button hover effect */
       }
+
+      .end-message {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .hidden {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -210,6 +219,21 @@
             id="message-input"
           />
           <button id="send-button">Send</button>
+          <button id="skip-button">Skip Typing</button>
+          <!-- Skip button -->
+        </div>
+        <div class="end-message hidden" id="end-message">
+          <button id="repeat-button">Repeat</button>
+          <button id="move-on-button">Move On</button>
+        </div>
+        <div class="accuracy-prompt hidden" id="accuracy-prompt">
+          <p>SO WAS THAT ACCURATE?</p>
+          <button id="yes-button">YES</button>
+          <button id="no-button">NO</button>
+        </div>
+        <div class="final-message hidden" id="final-message">
+          <p id="final-text"></p>
+          <button id="next-button" class="hidden">Next</button>
         </div>
       </div>
     </div>
@@ -236,8 +260,15 @@
       const chatBox = document.getElementById("chat-box");
       const messageInput = document.getElementById("message-input");
       const sendButton = document.getElementById("send-button");
+      const endMessage = document.getElementById("end-message");
+      const accuracyPrompt = document.getElementById("accuracy-prompt");
+      const finalMessage = document.getElementById("final-message");
+      const finalText = document.getElementById("final-text");
+      const nextButton = document.getElementById("next-button");
+      const skipButton = document.getElementById("skip-button"); // Skip button
 
       let messageIndex = 0;
+      let typingInterval;
 
       function displayMessage(message) {
         const messageDiv = document.createElement("div");
@@ -266,18 +297,69 @@
         chatBox.appendChild(typingIndicator);
         chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
 
-        setTimeout(() => {
+        typingInterval = setTimeout(() => {
           chatBox.removeChild(typingIndicator);
           if (messageIndex < messages.length) {
             displayMessage(messages[messageIndex]);
             messageIndex++;
             setTimeout(simulateTyping, 2000); // Wait 2 seconds before typing the next message
+          } else {
+            endMessage.classList.remove("hidden"); // Show end message options
           }
         }, 5000); // Show typing indicator for 5 seconds
       }
 
       // Start the simulation
       simulateTyping();
+
+      // Skip typing functionality
+      skipButton.addEventListener("click", () => {
+        clearTimeout(typingInterval); // Stop the typing simulation
+        chatBox.innerHTML = ""; // Clear the chat box
+        messages.forEach(displayMessage); // Display all messages immediately
+        endMessage.classList.remove("hidden"); // Show end message options
+      });
+
+      // Repeat button functionality
+      document.getElementById("repeat-button").addEventListener("click", () => {
+        location.reload(); // Reload the page
+      });
+
+      // Move on button functionality
+      document
+        .getElementById("move-on-button")
+        .addEventListener("click", () => {
+          endMessage.classList.add("hidden"); // Hide end message options
+          accuracyPrompt.classList.remove("hidden"); // Show accuracy prompt
+        });
+
+      // Yes button functionality
+      document.getElementById("yes-button").addEventListener("click", () => {
+        finalText.textContent =
+          "YAYYY. Hope you enjoyed that, but I have some more. Press 'here'.";
+        nextButton.classList.remove("hidden");
+        finalMessage.classList.remove("hidden"); // Show final message section
+      });
+
+      // No button functionality
+      document.getElementById("no-button").addEventListener("click", () => {
+        finalText.textContent =
+          "STFU IT IS. Hope you enjoyed that, but I have some more. Press 'here'.";
+        nextButton.classList.remove("hidden");
+        finalMessage.classList.remove("hidden"); // Show final message section
+      });
+
+      // Next button functionality
+      nextButton.addEventListener("click", () => {
+        finalText.textContent =
+          "Hope you enjoyed that, but I have some more. Press 'here'.";
+        nextButton.classList.add("hidden");
+        const link = document.createElement("a");
+        link.href = "https://nourrlo.github.io/surprise/yuh.html"; // Updated link
+        link.textContent = "here";
+        link.target = "_blank"; // Open link in a new tab
+        finalMessage.appendChild(link);
+      });
 
       // Send button functionality (optional)
       sendButton.addEventListener("click", () => {
@@ -290,3 +372,4 @@
     </script>
   </body>
 </html>
+
